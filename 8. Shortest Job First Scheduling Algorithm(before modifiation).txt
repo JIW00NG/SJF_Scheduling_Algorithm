@@ -1,0 +1,120 @@
+/*
+SJF SCHEDULING은 실행 시간이 가장 짧은 프로세스부터 CPU를 할당하는 비선점형 방식으로 최단 작업 우선 스케줄링 이라고도 한다. FCFS SCHEDULING의 콘보이 효과를 완화하는 효과가 있다. 그러나 종료시간예측이 어렵고 CPU 할당이 공평하지 못해 사용하기 힘들다.
+
+이 코드는 a[]가 a[0]이 아닌 a[1]부터 사용하기 때문에 1~9 즉, 총 9개의 프로세스를 실행 가능하며, 코드의 끝부분을 보면 실행순서대로 실행시간과 대기시간을 출력하는 간트 차트를 출력하는 부분이 존재한다.
+
+수정전 코드에서 n은 처리할 프로세스의 수, stime[]은 현재 사용되지 않으며, a[]는 프로세스를 입력받은 순서, b[] 는 프로세스의 burst time, w[] 는 프로세스의 waiting time을 나타내는 변수, avg는 대기시간 평균을 구하기위한 변수이며 평균은 소수점이 나올 수 있기 때문에 float형으로 선언되었다.
+i와 j 는 for문을 위한 변수이며, h는 간트차트 출력을 위한 변수, 그리고 t와 tt는 temp이다.
+
+실행 순서:
+1. clrscr() 로 화면을 깨끗하게 지우고, 몇 개의 프로세스를 처리할지 n에 입력 받음
+2. 각각의 프로세스들의 burst time을 입력 받음
+3. 프로세스들을 실행시간 오름차순으로 정렬한다. (b[]를 기준으로 b[],a[] 정렬)
+4. 처음 실행하는 프로세스의 waiting time을 0으로 초기화하고 출력
+5. 두번째부터 실행하는 프로세스들의 대기시간을 출력하고 avg에 모든 대기시간 합을 계산
+6. total waiting time과 average waiting time 출력
+7. 프로세스의 실행순서대로 burst time과 waiting time 간트 차트 출력 (waiting time 출력 시 1초의 간격을 두고 출력)
+8. getch() 으로 아무 입력이나 기다리며 입력을 받으면 종료
+
+*/
+
+#include<stdio.h>
+#include<conio.h>
+#include<dos.h>
+
+void main()
+{
+
+// n: 입력받을 프로세스의 수
+// b[10]: 프로세스들의 실행시간으로 최대 10개의 프로세스 관리 가능
+// w[10]: 프로세스들의 대기시간으로 최대 10개의 프로세스 관리 가능
+// i,j: for문을 위한 변수
+// h: '' 출력을 위한 변수
+// t,tt: temp
+ int n,b[10],w[10],i,j,h,t,tt;
+
+// stime[10]은 현재 사용되지 않음
+// a[10]: 프로세스를 입력받은 순서
+ int stime[10],a[10];
+
+// avg: 대기시간의 평균을 구하기 위한 변수
+ float avg=0;
+
+// 화면에 있는것들을 지우는 함수
+ clrscr();
+
+ printf("\n\tJOB SCHEDULING ALGORITHM[SJF]");
+ printf("\n\t*****************************************************\n");
+
+// 총 몇개의 프로세스를 처리할지 변수 n에 입력받음
+ printf("\nEnter howmany jobs:");
+ scanf("%d",&n);
+
+// 각각 프로세스별 실행시간 입력받음
+ printf("\nEnter burst time for corresponding job....\n");
+ for(i=1;i<=n;i++)
+ {
+  printf("\nProcess %d:",i);
+  scanf("%d",&b[i]);  a[i]=i;
+ }
+
+// 실행시간기준 오름차순 정렬
+for(i=1;i<=n;i++)
+  for(j=i;j<=n;j++)
+    if(b[i]>b[j])
+		{
+		  t=b[i]; tt=a[i];
+		  b[i]=b[j];  a[i]=a[j];
+		  b[j]=t;     a[j]=tt;
+		}
+
+// 처음실행하는 프로세스의 대기시간을 0으로 초기화
+ w[1]=0;
+
+// 처음실행하는 프로세스 대기시간 0이라고 출력
+ printf("\nprocess %d waiting time is 0",a[1]);
+
+//처음실행하는 프로세스를 뺀 나머지 프로세스들의 대기시간 출력
+//avg에 프로세스들의 모든 대기시간 합 계산
+ for(i=2;i<=n;i++)
+ {
+  w[i]=b[i-1]+w[i-1];
+  printf("\nProcess %d waiting time: %d",a[i],w[i]);
+  avg+=w[i];
+ }
+
+//total waiting time 출력
+ printf("\ntotal waiting time:%f",avg);
+
+//average waiting time 출력
+ printf("\n\nthe average waiting time is:%f\n",avg/n);
+
+ printf("\nGaunt Chart\n***************************************\n\n\t");
+
+// '' 출력을 위한 변수 설정
+ h=22;
+
+
+//프로세스의 실행순서대로 실행시간과 실행시간만큼 '' 출력
+ for(i=1;i<=n;i++)
+ {
+  printf("%d",b[i]);
+  for(j=1;j<=b[i];j++)
+   printf("%c",h);
+ }
+ printf("\n\t");
+
+//프로세스의 실행순서대로 대기시간과 대기시간 만큼 '' 출력
+ for(i=1;i<=n;i++)
+ {
+  printf("%d",w[i]);
+  for(j=1;j<=w[i];j++)
+   printf("%c",h);
+
+//1초 간격으로 출력
+  delay(1000);
+ }
+
+//아무 입력이나 기다림
+getch();
+}
